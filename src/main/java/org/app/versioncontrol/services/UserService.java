@@ -1,15 +1,12 @@
 package org.app.versioncontrol.services;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.app.versioncontrol.entities.authorization.User;
-import org.app.versioncontrol.entities.authorization.dto.MyUserDetails;
 import org.app.versioncontrol.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +15,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class MyUserDetailsService implements UserDetailsService {
+public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -26,16 +23,19 @@ public class MyUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            return new User();
+        }
 
-        return user.map(MyUserDetails::new).orElse(null);
+        return user;
     }
 
-    public boolean saveUser(User user) {
-        Optional<User> userFromDb = userRepository.findByUsername(user.getUsername());
+    public User saveUser(User user) {
+        User userFromDb = userRepository.findByUsername(user.getUsername());
 
-        if (userFromDb.isPresent()) {
-            return false;
+        if (userFromDb == null) {
+            return new User();
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -44,7 +44,7 @@ public class MyUserDetailsService implements UserDetailsService {
 
         userRepository.save(user);
 
-        return true;
+        return user;
     }
 
     public boolean deleteUser(long userId) {
@@ -59,6 +59,11 @@ public class MyUserDetailsService implements UserDetailsService {
     public User findByUserId(long userId) {
         return userRepository.findById(userId).orElse(new User());
     }
+
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
 
     public List<User> allUsers() {
         return userRepository.findAll();

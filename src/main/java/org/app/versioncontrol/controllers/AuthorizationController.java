@@ -1,9 +1,8 @@
 package org.app.versioncontrol.controllers;
 
 import org.app.versioncontrol.entities.authorization.User;
-import org.app.versioncontrol.services.MyUserDetailsService;
+import org.app.versioncontrol.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,14 +11,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+
 @Controller
 @RequestMapping("/authorization")
 public class AuthorizationController {
     @Autowired
-    private MyUserDetailsService userService;
+    private UserService userService;
 
     @GetMapping("/login")
     public String login() {
+        System.out.println(LocalDateTime.now());
         return "/authorization/login";
     }
 
@@ -38,11 +41,9 @@ public class AuthorizationController {
         if (!user.getPassword().equals(user.getConfirmedPassword())) {
             return "/authorization/registration";
         }
-        System.out.println(user);
-        if (!userService.saveUser(user)) {
+        if (userService.saveUser(user) == null) {
             return "/authorization/registration";
         }
-        System.out.println("ТУТ");
 
         return "redirect: /authorization/login";
     }

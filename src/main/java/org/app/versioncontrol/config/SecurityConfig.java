@@ -1,15 +1,12 @@
 package org.app.versioncontrol.config;
-import org.app.versioncontrol.services.MyUserDetailsService;
+import org.app.versioncontrol.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -20,8 +17,8 @@ public class SecurityConfig {
     private PasswordEncoder passwordEncoder;
 
     @Bean
-    public MyUserDetailsService myUserDetailsService() {
-        return new MyUserDetailsService();
+    public UserService myUserDetailsService() {
+        return new UserService();
     }
 
     @Bean
@@ -37,14 +34,13 @@ public class SecurityConfig {
         return httpSecurity
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/authorization/*").permitAll()
-                        .requestMatchers("/user/profile").hasRole("USER")
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/authorization/login")
                         .permitAll()
-                        .defaultSuccessUrl("/authorization/admin", true)
+                        .defaultSuccessUrl("/user/profile", true)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
