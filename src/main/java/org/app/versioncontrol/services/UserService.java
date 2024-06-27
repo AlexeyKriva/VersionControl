@@ -23,18 +23,16 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
+        Optional<User> user = userRepository.findByUsername(username);
+        if (user.isEmpty()) {
             return new User();
         }
-
-        return user;
+        return user.orElseGet(User::new);
     }
 
     public User saveUser(User user) {
-        User userFromDb = userRepository.findByUsername(user.getUsername());
-
-        if (userFromDb == null) {
+        Optional<User> userFromDb = userRepository.findByUsername(user.getUsername());
+        if (userFromDb.isPresent()) {
             return new User();
         }
 
@@ -60,7 +58,7 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(userId).orElse(new User());
     }
 
-    public User findByUsername(String username) {
+    public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
