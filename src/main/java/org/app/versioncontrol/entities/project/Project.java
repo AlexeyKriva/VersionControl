@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -17,12 +17,14 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(name = "name")
-    private String projectName;
+    private String name;
+    @Column(name = "description")
+    private String description;
     @Column(name = "user_id")
     private long userId;
     @Column(name = "added_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date addedDate;
-    @Column(name = "project_access")
-    private String access;
+    private LocalDateTime addedDate;
+    @Column(name = "with_access")
+    @Enumerated(EnumType.STRING)
+    private ProjectAccess withAccess;
 }
