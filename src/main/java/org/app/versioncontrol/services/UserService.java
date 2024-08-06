@@ -15,14 +15,13 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UserService implements UserDetailsService {
+public class UserService{
     @Autowired
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<User> user = userRepository.findByUsername(username);
         if (user.isEmpty()) {
             return new User();
@@ -38,7 +37,6 @@ public class UserService implements UserDetailsService {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setEnabled(true);
-        user.setRole("ROLE_USER");
 
         userRepository.save(user);
 

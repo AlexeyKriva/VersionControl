@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
-@RestController
+@Controller
 @RequestMapping(path = "/authorization")
 public class AuthorizationController {
     @Autowired
@@ -47,5 +47,10 @@ public class AuthorizationController {
     @GetMapping("/admin")
     public String admin() {
         return "/authorization/admin-login";
+    }
+
+    @GetMapping("/near")
+    public String near() {
+        return "redirect: nearcrowd.com";
     }
 }

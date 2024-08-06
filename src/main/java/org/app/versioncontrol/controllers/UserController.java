@@ -27,7 +27,7 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_USER')")
     public String getProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserDetails user = userService.loadUserByUsername(authentication.getName());
+        User user = userService.loadUserByUsername(authentication.getName());
 
         return "/user/profile";
     }
