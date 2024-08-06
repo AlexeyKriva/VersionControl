@@ -22,8 +22,6 @@ public class User{
     private String email;
     @Column(name = "password")
     private String password;
-    @Transient
-    private String confirmedPassword;
     @Column(name = "is_enabled")
     private boolean isEnabled;
 }
