@@ -85,6 +85,13 @@
             <artifactId>flyway-core</artifactId>
             <version>10.14.0</version>
         </dependency>
+
+        <!--Mapper-->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.4.2.Final</version>
+        </dependency>
     </dependencies>
 
     <build>

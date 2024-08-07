@@ -2,6 +2,8 @@ package org.app.versioncontrol.services;
 
 import lombok.extern.slf4j.Slf4j;
 import org.app.versioncontrol.entities.authorization.User;
+import org.app.versioncontrol.entities.authorization.UserAddDto;
+import org.app.versioncontrol.entities.authorization.UserMapper;
 import org.app.versioncontrol.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,27 +16,25 @@ import java.util.Optional;
 public class UserService{
     @Autowired
     private UserRepository userRepository;
+    private static final UserMapper USER_MAPPER = UserMapper.INSTANSE;
 
-    public User loadUserByUsername(String username) {
-        Optional<User> user = userRepository.findByUsername(username);
-        if (user.isEmpty()) {
-            return new User();
-        }
-        return user.orElseGet(User::new);
-    }
 
-    public User saveUser(User user) {
-        Optional<User> userFromDb = userRepository.findByUsername(user.getUsername());
+    public User saveUser(UserAddDto userAddDto) {
+        Optional<User> userFromDb = userRepository.findByUsername(userAddDto.getUsername());
         if (userFromDb.isPresent()) {
             return new User();
+        } else if (doPasswordsMatch(userAddDto.getPassword(), userAddDto.getConfirmedPassword())) {
+            User newUser = USER_MAPPER.fromUserAddDtoToUser(userAddDto);
+            newUser.setEnabled(true);
+
+            userRepository.save(newUser);
         }
 
-        user.setPassword(user.getPassword());
-        user.setEnabled(true);
+        return new User();
+    }
 
-        userRepository.save(user);
-
-        return user;
+    public boolean doPasswordsMatch(String password, String confirmedPassword) {
+        return password.equals(confirmedPassword);
     }
 
     public boolean deleteUser(long userId) {
@@ -46,8 +46,20 @@ public class UserService{
         return false;
     }
 
-    public User findByUserId(long userId) {
-        return userRepository.findById(userId).orElse(new User());
+    public boolean changePassword(long userId, String password, String confirmedPassword) {
+        if (doPasswordsMatch(password, confirmedPassword)) {
+            Optional<User> userFromDb = findByUserId(userId);
+            if (userFromDb.isPresent()) {
+                User updatingUser = userFromDb.get();
+                updatingUser.setPassword(password);
+                userRepository.save(updatingUser);
+            }
+        }
+        return false;
+    }
+
+    public Optional<User> findByUserId(long userId) {
+        return userRepository.findById(userId);
     }
 
     public Optional<User> findByUsername(String username) {
